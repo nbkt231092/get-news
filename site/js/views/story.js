@@ -2,7 +2,7 @@ import { h, safeUrl, timeAgo } from '../dom.js';
 import { loadMarket } from '../data.js';
 import { prefs } from '../prefs.js';
 import { SIDE_LABELS, BIAS_LABELS, sideOf } from '../coverage.js';
-import { coverageBar, storyMeta, storyImage, kickerLine } from '../components.js';
+import { coverageBar, storyMeta, storyImage, kickerLine, storyCheckbox, downloadTxt } from '../components.js';
 
 function missingStory(market, id) {
     const saved = prefs.saved()[id];
@@ -21,10 +21,13 @@ function missingStory(market, id) {
 function articleItem(article, source) {
     const url = safeUrl(article.url);
     const side = sideOf(source?.bias ?? null);
-    return h('li', { class: 'article' },
+    const sourceName = source?.name ?? article.sourceId;
+    const itemObj = { id: article.id, title: `[${sourceName}] ${article.title}`, summary: article.summary };
+    return h('li', { class: 'article selectable-item' },
+        storyCheckbox(itemObj),
         h('p', { class: 'article-source' },
             h('span', { class: `dot dot--${side}`, 'aria-hidden': 'true' }),
-            source?.name ?? article.sourceId,
+            sourceName,
             h('span', { class: 'bias-label' }, `· ${BIAS_LABELS[String(source?.bias ?? null)]}`)),
         h('h3', {}, url
             ? h('a', { href: url, target: '_blank', rel: 'noopener noreferrer' }, article.title)
@@ -87,6 +90,22 @@ export async function renderStory(market, id) {
         }
         setTimeout(() => { copyButton.textContent = 'Copy link'; }, 2000);
     });
+    const txtButton = h('button', { type: 'button', class: 'btn save-txt-btn' }, '⬇ Save to TXT');
+    txtButton.addEventListener('click', () => {
+        const checkboxes = [...columns.querySelectorAll('.story-select-cb')];
+        let checked = checkboxes.filter(cb => cb.checked);
+        if (!checked.length) {
+            for (const cb of checkboxes) {
+                cb.checked = true;
+                cb.closest('article, li')?.classList.add('is-selected');
+            }
+            checked = checkboxes;
+            window.dispatchEvent(new CustomEvent('onlynews:selection-change'));
+        }
+        const count = downloadTxt(checked.map(cb => cb.dataset.txtLine), `${market}-${story.id}`);
+        txtButton.textContent = `✓ Saved ${count} to TXT`;
+        setTimeout(() => { txtButton.textContent = '⬇ Save to TXT'; }, 2200);
+    });
 
     return h('article', { class: 'story-page' },
         h('a', { class: 'back', href: `#/${market}` }, '← Front page'),
@@ -101,7 +120,7 @@ export async function renderStory(market, id) {
                     sourceIds.map(sourceId => h('span', { class: 'chip' },
                         h('span', { class: `dot dot--${sideOf(sourcesById[sourceId]?.bias ?? null)}`, 'aria-hidden': 'true' }),
                         sourcesById[sourceId]?.name ?? sourceId))),
-                h('div', { class: 'actions' }, saveButton, copyButton)),
+                h('div', { class: 'actions' }, saveButton, copyButton, txtButton)),
             storyImage(story.image, 'story-hero')),
         tabs,
         columns);

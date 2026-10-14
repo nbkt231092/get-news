@@ -47,9 +47,49 @@ export function kickerLine(story) {
     return story.kicker ? h('p', { class: 'kicker' }, story.kicker) : null;
 }
 
+export function storyTxtLine(story) {
+    const summary = story.summary ?? story.articles?.[0]?.summary ?? '';
+    const raw = summary ? `${story.title} — ${summary}` : story.title;
+    return String(raw ?? '').replace(/\s+/g, ' ').trim();
+}
+
+export function downloadTxt(lines, prefix = 'onlynews') {
+    const cleanLines = lines.map(l => String(l ?? '').replace(/\s+/g, ' ').trim()).filter(Boolean);
+    if (!cleanLines.length) return 0;
+    const content = cleanLines.join('\r\n\r\n') + '\r\n';
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${prefix}-${stamp}.txt`;
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return cleanLines.length;
+}
+
+export function storyCheckbox(story) {
+    const cb = h('input', {
+        type: 'checkbox',
+        class: 'story-select-cb',
+        'aria-label': `Select: ${story.title}`,
+        dataset: { storyId: story.id, txtLine: storyTxtLine(story) },
+    });
+    cb.addEventListener('change', () => {
+        cb.closest('article, li')?.classList.toggle('is-selected', cb.checked);
+        window.dispatchEvent(new CustomEvent('onlynews:selection-change'));
+    });
+    const label = h('label', { class: 'story-select-wrap', title: 'Select story for Save to TXT' }, cb);
+    label.addEventListener('click', event => event.stopPropagation());
+    return label;
+}
+
 export function leadStory(story, market) {
     const summary = story.summary ?? story.articles[0]?.summary;
-    return h('article', { class: 'lead' },
+    return h('article', { class: 'lead selectable-item' },
+        storyCheckbox(story),
         h('a', { class: 'story-link', href: storyHref(story, market) },
             storyImage(story.image, 'lead-img'),
             h('div', { class: 'lead-body' },
@@ -61,7 +101,8 @@ export function leadStory(story, market) {
 }
 
 export function storyCard(story, market) {
-    return h('article', { class: 'card' },
+    return h('article', { class: 'card selectable-item' },
+        storyCheckbox(story),
         h('a', { class: 'story-link', href: storyHref(story, market) },
             storyImage(story.image, 'card-img'),
             h('div', { class: 'card-body' },
@@ -74,7 +115,8 @@ export function storyCard(story, market) {
 // Grande del bloque hero de los resultados: foto arriba, titular grande y barra.
 export function heroLead(story, market) {
     const summary = story.summary ?? story.articles[0]?.summary;
-    return h('article', { class: 'card hero-lead' },
+    return h('article', { class: 'card hero-lead selectable-item' },
+        storyCheckbox(story),
         h('a', { class: 'story-link', href: storyHref(story, market) },
             storyImage(story.image, 'card-img'),
             h('div', { class: 'card-body' },
@@ -87,7 +129,8 @@ export function heroLead(story, market) {
 
 // Pequeña: titular, metadatos y barra; miniatura solo si hay foto.
 export function storySmall(story, market) {
-    return h('article', { class: 'small' },
+    return h('article', { class: 'small selectable-item' },
+        storyCheckbox(story),
         h('a', { class: `story-link${story.image ? ' has-thumb' : ''}`, href: storyHref(story, market) },
             storyImage(story.image, 'small-thumb'),
             h('div', { class: 'small-body' },
@@ -98,7 +141,8 @@ export function storySmall(story, market) {
 }
 
 export function storyRow(story, market, { compact = false } = {}) {
-    return h('li', { class: 'row' },
+    return h('li', { class: 'row selectable-item' },
+        storyCheckbox(story),
         h('a', { class: 'story-link', href: storyHref(story, market) },
             h('div', { class: 'row-text' },
                 kickerLine(story),

@@ -1,8 +1,46 @@
 import { h } from '../dom.js';
 import { loadMarket } from '../data.js';
-import { t, MARKET_NAMES, leadStory, storyCard, storyRow, blindspotPanel, savedPanel, methodPanel, satirePanel } from '../components.js';
+import { t, MARKET_NAMES, leadStory, storyCard, storyRow, blindspotPanel, savedPanel, methodPanel, satirePanel, downloadTxt } from '../components.js';
 
 const GRID_SIZE = 6;
+
+function saveSectionToTxt(containerEl, prefix, btn) {
+    const checkboxes = [...containerEl.querySelectorAll('.story-select-cb')];
+    if (!checkboxes.length) return;
+    let checked = checkboxes.filter(cb => cb.checked);
+    if (!checked.length) {
+        for (const cb of checkboxes) {
+            cb.checked = true;
+            cb.closest('article, li')?.classList.add('is-selected');
+        }
+        checked = checkboxes;
+        window.dispatchEvent(new CustomEvent('onlynews:selection-change'));
+    }
+    const lines = checked.map(cb => cb.dataset.txtLine).filter(Boolean);
+    const count = downloadTxt(lines, prefix);
+    if (btn && count) {
+        const prev = btn.textContent;
+        btn.textContent = `✓ Saved ${count} to TXT`;
+        setTimeout(() => { btn.textContent = prev; }, 2200);
+    }
+}
+
+function sectionHeader(id, titleText, dark, getContainer, prefix) {
+    const btn = h('button', {
+        type: 'button',
+        class: 'btn btn--sm save-section-btn',
+        title: 'Check and save stories in this section to .txt',
+        onclick: event => {
+            event.preventDefault();
+            event.stopPropagation();
+            const container = getContainer();
+            if (container) saveSectionToTxt(container, prefix, btn);
+        },
+    }, '⬇ Save to TXT');
+    return h('div', { class: 'section-head' },
+        h('h2', { id, class: `section-title${dark ? ' section-title--dark' : ''}` }, titleText),
+        btn);
+}
 
 export async function renderHome(market) {
     const { stories } = await loadMarket(market);
@@ -19,19 +57,48 @@ export async function renderHome(market) {
     const rest = multi.filter(story => story !== lead);
     const otherSingles = singles.filter(story => story !== lead);
 
+    let topSectionEl = null;
+    let moreSectionEl = null;
+    let singlesEl = null;
+
+    if (rest.length) {
+        topSectionEl = h('section', { 'aria-labelledby': 'top-h' },
+            sectionHeader('top-h', t('topSection'), false, () => topSectionEl, `${market}-top`),
+            h('div', { class: 'card-grid' }, rest.slice(0, GRID_SIZE).map(story => storyCard(story, market))));
+    }
+
+    if (rest.length > GRID_SIZE) {
+        moreSectionEl = h('section', { 'aria-labelledby': 'more-h' },
+            sectionHeader('more-h', t('moreSection'), true, () => moreSectionEl, `${market}-more`),
+            h('ol', { class: 'story-list' }, rest.slice(GRID_SIZE).map(story => storyRow(story, market))));
+    }
+
+    if (otherSingles.length) {
+        const singlesSaveBtn = h('button', {
+            type: 'button',
+            class: 'btn btn--sm save-section-btn',
+            style: 'margin-left:12px',
+            onclick: event => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (singlesEl) {
+                    singlesEl.open = true;
+                    saveSectionToTxt(singlesEl, `${market}-singles`, singlesSaveBtn);
+                }
+            },
+        }, '⬇ Save to TXT');
+        singlesEl = h('details', { class: 'singles' },
+            h('summary', {}, `${t('singles')} (${otherSingles.length})`, singlesSaveBtn),
+            h('ol', { class: 'story-list story-list--compact' }, otherSingles.map(story => storyRow(story, market, { compact: true }))));
+    }
+
     return h('div', { class: 'home' },
         h('div', { class: 'home-main' },
             h('h1', { class: 'visually-hidden' }, `Front page · ${MARKET_NAMES[market]}`),
             leadStory(lead, market),
-            rest.length ? h('section', { 'aria-labelledby': 'top-h' },
-                h('h2', { id: 'top-h', class: 'section-title' }, t('topSection')),
-                h('div', { class: 'card-grid' }, rest.slice(0, GRID_SIZE).map(story => storyCard(story, market)))) : null,
-            rest.length > GRID_SIZE ? h('section', { 'aria-labelledby': 'more-h' },
-                h('h2', { id: 'more-h', class: 'section-title section-title--dark' }, t('moreSection')),
-                h('ol', { class: 'story-list' }, rest.slice(GRID_SIZE).map(story => storyRow(story, market)))) : null,
-            otherSingles.length ? h('details', { class: 'singles' },
-                h('summary', {}, `${t('singles')} (${otherSingles.length})`),
-                h('ol', { class: 'story-list story-list--compact' }, otherSingles.map(story => storyRow(story, market, { compact: true })))) : null),
+            topSectionEl,
+            moreSectionEl,
+            singlesEl),
         h('aside', { class: 'home-aside' },
             satirePanel(market),
             blindspotPanel(multi, market),

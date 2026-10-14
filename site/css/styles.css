@@ -75,6 +75,17 @@ ol, ul { margin: 0; padding: 0; list-style: none; }
 .refresh-btn { height: 44px; padding: 0 14px; background: var(--accent); color: var(--on-accent); white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
 .refresh-btn:hover { background: var(--surface-2); color: var(--text); }
 .refresh-btn:disabled { opacity: 0.7; cursor: wait; }
+.save-txt-btn { height: 44px; padding: 0 14px; background: var(--surface); color: var(--text); white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+.save-txt-btn:hover { background: var(--accent); color: var(--on-accent); }
+.btn--sm { padding: 6px 10px; font-size: 12px; }
+.section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 40px 0 18px; }
+.section-head .section-title { margin: 0; }
+.selectable-item { position: relative; }
+.selectable-item.is-selected { outline: 3px solid var(--accent); }
+.story-select-wrap { position: absolute; top: 8px; right: 8px; z-index: 3; width: 26px; height: 26px; display: grid; place-items: center; background: var(--surface); border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); cursor: pointer; }
+.story-select-wrap:hover { background: var(--accent); }
+.story-select-cb { width: 16px; height: 16px; margin: 0; accent-color: var(--ink); cursor: pointer; }
+.row.selectable-item .story-link { padding-right: 44px; }
 
 @media (max-width: 760px) {
     .header-inner { grid-template-columns: auto 1fr auto; grid-template-areas: "brand . actions" "tabs search search"; gap: 12px; padding-block: 12px; }

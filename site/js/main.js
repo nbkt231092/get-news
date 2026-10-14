@@ -2,7 +2,7 @@
 import { prefs } from './prefs.js';
 import { loadJson, loadMarket, clearCache } from './data.js';
 import { marketSummary } from './coverage.js';
-import { MARKET_NAMES, t } from './components.js';
+import { MARKET_NAMES, t, downloadTxt } from './components.js';
 import { scoreLine } from './satire/voice.js';
 import { h, timeAgo } from './dom.js';
 import { renderHome } from './views/home.js';
@@ -30,9 +30,18 @@ const themeButton = document.getElementById('theme-toggle');
 const monitor = document.getElementById('monitor');
 const satireButton = document.getElementById('satire-toggle');
 const refreshButton = document.getElementById('refresh-btn');
+const saveTxtButton = document.getElementById('save-txt-btn');
 const tagline = document.getElementById('tagline');
 let renderToken = 0;
 let monitorToken = 0;
+
+function updateSaveTxtLabel() {
+    if (!saveTxtButton) return;
+    const checkedCount = app.querySelectorAll('.story-select-cb:checked').length;
+    saveTxtButton.textContent = checkedCount > 0 ? `⬇ Save to TXT (${checkedCount})` : '⬇ Save to TXT';
+}
+
+window.addEventListener('onlynews:selection-change', updateSaveTxtLabel);
 
 // «auto» sigue al sistema hasta el primer clic; desde ahí el botón alterna claro/oscuro
 // según lo que se ve, sin pasos intermedios que no cambian nada en pantalla.
@@ -74,6 +83,7 @@ async function show(viewPromise, { keepScroll = false } = {}) {
         const node = await viewPromise;
         if (token !== renderToken) return;
         app.replaceChildren(node);
+        updateSaveTxtLabel();
     } catch (error) {
         if (token !== renderToken) return;
         console.error(error);
@@ -212,6 +222,25 @@ satireButton.addEventListener('click', () => {
     }
     route({ keepScroll: true });
 });
+
+if (saveTxtButton) {
+    saveTxtButton.addEventListener('click', () => {
+        const checkboxes = [...app.querySelectorAll('.story-select-cb')];
+        if (!checkboxes.length) return;
+        let checked = checkboxes.filter(cb => cb.checked);
+        if (!checked.length) {
+            for (const cb of checkboxes) {
+                cb.checked = true;
+                cb.closest('article, li')?.classList.add('is-selected');
+            }
+            checked = checkboxes;
+        }
+        const market = MARKETS.includes(prefs.market) ? prefs.market : 'news';
+        const count = downloadTxt(checked.map(cb => cb.dataset.txtLine), `onlynews-${market}`);
+        saveTxtButton.textContent = `✓ Saved ${count} to TXT`;
+        setTimeout(updateSaveTxtLabel, 2200);
+    });
+}
 
 if (refreshButton) {
     refreshButton.addEventListener('click', async () => {
