@@ -55,23 +55,23 @@ function percentAward(bySource, test, sourcesById, meta) {
     return { ...meta, winner: nameOf(sourcesById, best.id), figure: `${best.pct} %`, blurb: meta.blurb(nameOf(sourcesById, best.id), best), evidence: evidenceOf(best.hits) };
 }
 
-export function awardsFor(stories, sourcesById, { lang = 'es' } = {}) {
-    const list = LISTS[lang] ?? LISTS.es;
+export function awardsFor(stories, sourcesById, { lang = 'en' } = {}) {
+    const list = LISTS[lang] ?? LISTS.en;
     const safe = stories.filter(story => !isSensitive(story));
     const bySource = {};
     for (const story of safe) for (const article of story.articles) (bySource[article.sourceId] ??= []).push(article);
     const awards = [];
 
     awards.push(percentAward(bySource, a => isCombat(a.title, list), sourcesById,
-        { id: 'adjetivometro', emoji: '🏆', title: 'Adjetivómetro', blurb: (name, b) => `${name}: ${b.pct} % de titulares en pie de guerra` }));
+        { id: 'adjetivometro', emoji: '🏆', title: 'Adjective-o-meter', blurb: (name, b) => `${name}: ${b.pct}% of headlines on the warpath` }));
     awards.push(percentAward(bySource, a => isClickbait(a.title, list), sourcesById,
-        { id: 'clickbait', emoji: '🎣', title: 'Clickbaitómetro', blurb: name => `${name} pregunta, tú haces clic` }));
+        { id: 'clickbait', emoji: '🎣', title: 'Clickbait-o-meter', blurb: name => `${name} asks, you click` }));
 
     const solos = {};
     for (const story of safe.filter(s => s.sourceCount === 1)) (solos[story.articles[0].sourceId] ??= []).push(story.articles[0]);
     const solo = bestBy(Object.entries(solos).map(([id, arts]) => ({ id, total: arts.length, arts })), entry => entry.total);
-    if (solo) awards.push({ id: 'solo-yo', emoji: '🕵️', title: 'Solo yo me he enterado', winner: nameOf(sourcesById, solo.id),
-        figure: String(solo.total), blurb: `${solo.total} exclusivas que no quiso nadie más`, evidence: evidenceOf(solo.arts) });
+    if (solo) awards.push({ id: 'solo-yo', emoji: '🕵️', title: 'Only I Noticed', winner: nameOf(sourcesById, solo.id),
+        figure: String(solo.total), blurb: `${solo.total} exclusives nobody else wanted`, evidence: evidenceOf(solo.arts) });
 
     const copies = safe.map(story => {
         const groups = new Map();
@@ -84,11 +84,11 @@ export function awardsFor(stories, sourcesById, { lang = 'es' } = {}) {
         return { id: story.id, total: story.sourceCount, story, top };
     });
     const copy = bestBy(copies.filter(c => c.top.length >= 3), c => c.top.length);
-    if (copy) awards.push({ id: 'copia-pega', emoji: '📋', title: 'Copia y pega de oro', winner: copy.top[0].title,
-        figure: `${copy.top.length} medios`, blurb: `${copy.top.length} medios, una sola frase`, evidence: evidenceOf(copy.top) });
+    if (copy) awards.push({ id: 'copia-pega', emoji: '📋', title: 'Golden Copy & Paste', winner: copy.top[0].title,
+        figure: `${copy.top.length} sources`, blurb: `${copy.top.length} outlets, one single sentence`, evidence: evidenceOf(copy.top) });
 
     awards.push(percentAward(bySource, a => isShout(a.title), sourcesById,
-        { id: 'grito', emoji: '📢', title: 'Grito del día', blurb: name => `${name} no habla: grita` }));
+        { id: 'grito', emoji: '📢', title: 'Shout of the Day', blurb: name => `${name} doesn’t speak: it shouts` }));
 
     const consensus = bestBy(safe.filter(s => s.coverage?.left >= 1 && s.coverage?.center >= 1 && s.coverage?.right >= 1)
         .map(story => ({ id: story.id, total: story.sourceCount, story })), entry => entry.total);
@@ -97,8 +97,8 @@ export function awardsFor(stories, sourcesById, { lang = 'es' } = {}) {
             const bias = sourcesById[a.sourceId]?.bias;
             return side === 'left' ? bias < 0 : side === 'right' ? bias > 0 : bias === 0;
         })).filter(Boolean);
-        awards.push({ id: 'consenso', emoji: '🤝', title: 'Consenso del día', winner: consensus.story.title,
-            figure: `${consensus.total} medios`, blurb: 'Lo único en lo que hoy está de acuerdo la prensa',
+        awards.push({ id: 'consenso', emoji: '🤝', title: 'Consensus of the Day', winner: consensus.story.title,
+            figure: `${consensus.total} sources`, blurb: 'The only thing the press agrees on today',
             evidence: evidenceOf(bySide.length ? bySide : consensus.story.articles) });
     }
     return awards.filter(Boolean);

@@ -6,10 +6,11 @@ import { awardsFor } from '../satire/awards.js';
 export async function renderAwards(market) {
     const { stories, sourcesById } = await loadMarket(market);
     document.title = `${t('awardsTitle')} · OnlyNews`;
-    const awards = awardsFor(stories, sourcesById, { lang: market === 'intl' ? 'en' : 'es' });
+    const awards = awardsFor(stories, sourcesById, { lang: 'en' });
+    const pressName = market === 'us' ? 'US press' : market === 'military' ? 'US military press' : market === 'vn' ? 'Vietnamese press' : 'international press';
     return h('section', { class: 'page satire-page' },
         h('h1', { class: 'page-title' }, `${t('awardsTitle')} · ${MARKET_NAMES[market]}`),
-        h('p', { class: 'hint' }, t('awardsIntro', { press: market === 'intl' ? 'prensa internacional' : 'prensa española' })),
+        h('p', { class: 'hint' }, t('awardsIntro', { press: pressName })),
         awards.length
             ? h('div', { class: 'awards' }, awards.map(award => h('article', { class: 'award' },
                 h('p', { class: 'award-name' }, h('span', { 'aria-hidden': 'true' }, award.emoji), ` ${award.title}`),

@@ -9,8 +9,8 @@ export async function renderHome(market) {
     document.title = `${MARKET_NAMES[market]} · OnlyNews`;
     if (!stories.length) {
         return h('div', { class: 'notice' },
-            h('h1', {}, 'No hay historias que mostrar'),
-            h('p', {}, 'Puede que hayas ocultado todos los medios. ', h('a', { href: '#/fuentes' }, 'Revisa los medios visibles'), '.'));
+            h('h1', {}, 'No stories to show'),
+            h('p', {}, 'You may have hidden all media sources. ', h('a', { href: '#/fuentes' }, 'Check visible sources'), '.'));
     }
 
     const multi = stories.filter(story => story.sourceCount > 1);
@@ -21,7 +21,7 @@ export async function renderHome(market) {
 
     return h('div', { class: 'home' },
         h('div', { class: 'home-main' },
-            h('h1', { class: 'visually-hidden' }, `Portada · ${MARKET_NAMES[market]}`),
+            h('h1', { class: 'visually-hidden' }, `Front page · ${MARKET_NAMES[market]}`),
             leadStory(lead, market),
             rest.length ? h('section', { 'aria-labelledby': 'top-h' },
                 h('h2', { id: 'top-h', class: 'section-title' }, t('topSection')),

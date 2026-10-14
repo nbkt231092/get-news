@@ -4,14 +4,14 @@ import { SIDES, SIDE_LABELS } from './coverage.js';
 import { prefs } from './prefs.js';
 import { say } from './satire/voice.js';
 
-export const MARKET_NAMES = { es: 'España', intl: 'Internacional' };
-const SHORT = { left: 'I', center: 'C', right: 'D' };
-const SEGMENT_LABELS = { left: 'IZQ', center: 'CEN', right: 'DER', unrated: 'S/C' };
+export const MARKET_NAMES = { us: 'United States', military: 'US Military', intl: 'International', vn: 'Vietnam' };
+const SHORT = { left: 'L', center: 'C', right: 'R' };
+const SEGMENT_LABELS = { left: 'LEFT', center: 'CEN', right: 'RIGHT', unrated: 'N/A' };
 
 export function coverageBar(coverage, { large = false } = {}) {
     const present = SIDES.filter(side => coverage[side] > 0);
     const label = present.map(side => `${coverage[side]} ${SIDE_LABELS[side].toLowerCase()}`).join(', ');
-    return h('div', { class: `coverage${large ? ' coverage--lg' : ''}`, role: 'img', 'aria-label': `Cobertura: ${label}` },
+    return h('div', { class: `coverage${large ? ' coverage--lg' : ''}`, role: 'img', 'aria-label': `Coverage: ${label}` },
         h('div', { class: 'coverage-bar' }, present.map(side => h('span', { class: `seg seg--${side}`, style: `flex-grow:${coverage[side]}` },
             large ? `${SEGMENT_LABELS[side]} ${coverage[side]}` : null))),
         h('div', { class: 'coverage-legend', 'aria-hidden': 'true' },
@@ -20,9 +20,9 @@ export function coverageBar(coverage, { large = false } = {}) {
 
 export function storyMeta(story) {
     return h('p', { class: 'story-meta' },
-        h('span', {}, `${plural(story.sourceCount, 'medio', 'medios')} · ${timeAgo(story.lastSeen)}`),
+        h('span', {}, `${plural(story.sourceCount, 'source', 'sources')} · ${timeAgo(story.lastSeen)}`),
         story.blindspot
-            ? h('span', { class: `badge badge--${story.blindspot}` }, `Solo ${story.blindspot === 'left' ? 'izquierda' : 'derecha'}`)
+            ? h('span', { class: `badge badge--${story.blindspot}` }, `${story.blindspot === 'left' ? 'Left' : 'Right'} only`)
             : null);
 }
 
@@ -111,7 +111,7 @@ export function storyMini(story, market) {
     return h('li', {},
         h('a', { class: 'mini', href: storyHref(story, market) },
             h('span', { class: 'mini-title' }, story.title),
-            h('span', { class: 'mini-meta' }, `${plural(story.sourceCount, 'medio', 'medios')} · ${timeAgo(story.lastSeen)}`)));
+            h('span', { class: 'mini-meta' }, `${plural(story.sourceCount, 'source', 'sources')} · ${timeAgo(story.lastSeen)}`)));
 }
 
 export function blindspotPanel(stories, market) {
@@ -119,14 +119,14 @@ export function blindspotPanel(stories, market) {
         const list = stories.filter(story => story.blindspot === side).slice(0, 5);
         return [
             h('h3', { class: `side-${side}` }, title),
-            list.length ? h('ol', { class: 'mini-list' }, list.map(story => storyMini(story, market))) : h('p', { class: 'empty' }, 'Ninguna ahora mismo.'),
+            list.length ? h('ol', { class: 'mini-list' }, list.map(story => storyMini(story, market))) : h('p', { class: 'empty' }, 'None right now.'),
         ];
     };
     return h('section', { class: 'panel panel--blindspot', 'aria-labelledby': 'blindspots-h' },
         h('h2', { id: 'blindspots-h' }, t('blindspots')),
         h('p', { class: 'hint' }, t('blindspotsHint')),
-        group('left', 'Solo la izquierda'),
-        group('right', 'Solo la derecha'));
+        group('left', 'Left only'),
+        group('right', 'Right only'));
 }
 
 export function savedPanel(stories, market) {
@@ -139,25 +139,25 @@ export function savedPanel(stories, market) {
             ? storyMini(byId.get(id), market)
             : h('li', {}, h('a', { class: 'mini', href: `#/${market}/${id}` },
                 h('span', { class: 'mini-title' }, entry.title),
-                h('span', { class: 'mini-meta' }, 'Ya no está en portada'))));
+                h('span', { class: 'mini-meta' }, 'No longer on the front page'))));
     return h('section', { class: 'panel', 'aria-labelledby': 'saved-h' },
         h('h2', { id: 'saved-h' }, t('saved')),
         items.length ? h('ol', { class: 'mini-list' }, items) : h('p', { class: 'empty' }, t('savedEmpty')),
-        saved.length ? h('a', { class: 'panel-link', href: `#/${market}/guardadas` }, `Ver todas (${saved.length})`) : null);
+        saved.length ? h('a', { class: 'panel-link', href: `#/${market}/guardadas` }, `View all (${saved.length})`) : null);
 }
 
 // Accesos a Premios y Bingo en el lateral de la portada, solo con el modo coña.
 export function satirePanel(market) {
     if (!prefs.satire) return null;
     return h('section', { class: 'panel panel--note', 'aria-labelledby': 'satire-h' },
-        h('h2', { id: 'satire-h' }, 'Hoy en la prensa'),
-        h('a', { href: `#/${market}/premios` }, 'Premios del día →'),
-        h('a', { href: `#/${market}/bingo` }, 'Bingo del titular →'));
+        h('h2', { id: 'satire-h' }, 'Today in the press'),
+        h('a', { href: `#/${market}/premios` }, 'Daily Awards →'),
+        h('a', { href: `#/${market}/bingo` }, 'Headline Bingo →'));
 }
 
 export function methodPanel() {
     return h('section', { class: 'panel panel--note', 'aria-labelledby': 'method-h' },
-        h('h2', { id: 'method-h' }, '¿Cómo medimos?'),
-        h('p', {}, 'Cada medio tiene una orientación aproximada, de izquierda a derecha. La barra cuenta cuántos medios de cada lado cubren cada historia.'),
-        h('a', { href: '#/fuentes' }, 'Ver medios y criterios →'));
+        h('h2', { id: 'method-h' }, 'How do we measure?'),
+        h('p', {}, 'Each outlet has an approximate orientation, from left to right. The bar counts how many outlets from each side cover each story.'),
+        h('a', { href: '#/fuentes' }, 'View sources & criteria →'));
 }

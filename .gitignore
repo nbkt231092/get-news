@@ -17,7 +17,6 @@
 ###< symfony/phpunit-bridge ###
 
 ###> static site (GitHub Pages) ###
-/site/data/
 ###< static site ###
 
 ###> pipeline (node) ###

@@ -28,8 +28,8 @@ export const prefs = {
     get satire() { return read('satire', false) === true; },
     set satire(value) { write('satire', Boolean(value)); },
 
-    get market() { return read('market', 'es'); },
-    set market(value) { write('market', value); },
+    get market() { return read('market_us', 'us'); },
+    set market(value) { write('market_us', value); },
 
     saved() {
         const saved = read('saved', {});

@@ -30,7 +30,7 @@ function renderBlocks(blocks, market) {
 export async function renderSearch(market, query) {
     const { stories, sourcesById } = await loadMarket(market);
     const needle = fold(query.trim());
-    document.title = needle ? `Buscar «${query}» · OnlyNews` : 'Buscar · OnlyNews';
+    document.title = needle ? `Search “${query}” · OnlyNews` : 'Search · OnlyNews';
     const matches = needle
         ? stories.filter(story => fold([
             story.title,
@@ -39,11 +39,11 @@ export async function renderSearch(market, query) {
         ].join(' ')).includes(needle))
         : [];
     return h('section', { class: 'page' },
-        h('h1', { class: 'page-title' }, needle ? `Resultados para «${query}»` : 'Buscar'),
+        h('h1', { class: 'page-title' }, needle ? `Results for “${query}”` : 'Search'),
         h('p', { class: 'hint' },
-            matches.length ? h('span', { class: 'results-count' }, `${plural(matches.length, 'historia', 'historias')} · `) : null,
-            `Busca en las historias de las últimas 48 h · ${MARKET_NAMES[market]}`),
+            matches.length ? h('span', { class: 'results-count' }, `${plural(matches.length, 'story', 'stories')} · `) : null,
+            `Search stories from the last 48h · ${MARKET_NAMES[market]}`),
         matches.length
             ? h('div', { class: 'results' }, renderBlocks(composeBlocks(matches), market))
-            : h('p', { class: 'empty', style: 'margin-top:20px' }, needle ? t('searchEmpty') : 'Escribe algo en el buscador.'));
+            : h('p', { class: 'empty', style: 'margin-top:20px' }, needle ? t('searchEmpty') : 'Type something in the search box.'));
 }

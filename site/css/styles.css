@@ -69,9 +69,12 @@ ol, ul { margin: 0; padding: 0; list-style: none; }
 .search { justify-self: end; width: min(320px, 100%); }
 .search input { width: 100%; padding: 10px 12px; border: var(--bw) solid var(--ink); border-radius: 0; background: var(--surface); color: var(--text); font: 400 15px/1.2 var(--mono); box-shadow: var(--shadow-sm); }
 .search input::placeholder { color: var(--muted); }
-.header-actions { display: flex; gap: 10px; }
+.header-actions { display: flex; gap: 10px; align-items: center; }
 .icon-btn { display: inline-grid; place-items: center; width: 44px; height: 44px; border: var(--bw) solid var(--ink); background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); text-decoration: none; cursor: pointer; padding: 0; }
 .icon-btn:hover { background: var(--accent); color: var(--on-accent); }
+.refresh-btn { height: 44px; padding: 0 14px; background: var(--accent); color: var(--on-accent); white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+.refresh-btn:hover { background: var(--surface-2); color: var(--text); }
+.refresh-btn:disabled { opacity: 0.7; cursor: wait; }
 
 @media (max-width: 760px) {
     .header-inner { grid-template-columns: auto 1fr auto; grid-template-areas: "brand . actions" "tabs search search"; gap: 12px; padding-block: 12px; }

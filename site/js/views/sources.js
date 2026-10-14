@@ -8,7 +8,7 @@ const LEVELS = [-2, -1, 0, 1, 2, null];
 
 export async function renderSources() {
     const [sources, meta] = await Promise.all([loadJson('sources'), loadJson('meta').catch(() => null)]);
-    document.title = 'Medios · OnlyNews';
+    document.title = 'Sources · OnlyNews';
     const feedOk = new Map();
     for (const feed of meta?.feeds ?? []) feedOk.set(feed.sourceId, (feedOk.get(feed.sourceId) ?? false) || feed.ok);
     const hidden = prefs.hiddenSources();
@@ -21,7 +21,7 @@ export async function renderSources() {
         return h('li', { class: 'source-row' },
             checkbox,
             h('label', { for: `src-${source.id}` }, source.name),
-            feedOk.get(source.id) === false ? h('span', { class: 'source-down' }, 'sin datos ahora') : null,
+            feedOk.get(source.id) === false ? h('span', { class: 'source-down' }, 'no data right now') : null,
             site ? h('a', { href: site, target: '_blank', rel: 'noopener noreferrer' }, new URL(site).hostname.replace(/^www\./, '')) : null);
     };
 
@@ -39,12 +39,14 @@ export async function renderSources() {
     };
 
     return h('section', { class: 'sources-page' },
-        h('h1', { class: 'page-title' }, 'Cómo clasificamos los medios'),
+        h('h1', { class: 'page-title' }, 'How we classify media sources'),
         h('div', { class: 'prose' },
-            h('p', {}, 'Cada medio tiene una orientación en cinco niveles, de izquierda a derecha, según su línea editorial tal como suele describirse públicamente. En los medios internacionales nos apoyamos en AllSides y Ad Fontes. ', h('strong', {}, 'Es una clasificación orientativa'), ', no un juicio sobre la calidad de cada medio.'),
-            h('p', {}, 'La barra de cobertura cuenta ', h('strong', {}, 'medios distintos'), ': azul para izquierda y centro-izquierda, gris para el centro y rojo para centro-derecha y derecha. Las agencias y medios públicos van al centro; los verificadores quedan sin clasificar.'),
-            h('p', {}, 'Una historia es un ', h('strong', {}, 'blindspot'), ' cuando la cubren al menos 3 medios, uno de los lados aporta el 80 % o más de los que tienen orientación y ningún medio del lado contrario la ha publicado.'),
-            h('p', {}, 'Desmarca un medio para ocultarlo en tu portada; la cobertura se recalcula sin él. Se guarda solo en este navegador.')),
-        marketSection('es'),
-        marketSection('intl'));
+            h('p', {}, 'Each outlet is assigned an orientation on a five-level scale, from Left to Right, based on its publicly recognized editorial stance. For international outlets we rely on AllSides and Ad Fontes. ', h('strong', {}, 'This is an indicative classification'), ', not a judgment on the quality of any outlet.'),
+            h('p', {}, 'The coverage bar counts ', h('strong', {}, 'distinct outlets'), ': blue for Left and Center-left, gray for Center, and red for Center-right and Right. Wire agencies and public broadcasters are placed in the Center; fact-checkers remain unrated.'),
+            h('p', {}, 'A story is marked as a ', h('strong', {}, 'blindspot'), ' when it is covered by at least 3 outlets, one side accounts for 80% or more of rated outlets, and no outlet on the opposite side has published it.'),
+            h('p', {}, 'Uncheck an outlet to hide it from your front page; coverage is recalculated without it. Preferences are saved only in this browser.')),
+        marketSection('us'),
+        marketSection('military'),
+        marketSection('intl'),
+        marketSection('vn'));
 }

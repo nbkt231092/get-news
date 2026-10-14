@@ -6,9 +6,13 @@ import { isSensitive } from './satire/guard.js';
 
 const cache = new Map();
 
+export function clearCache() {
+    cache.clear();
+}
+
 export function loadJson(name) {
     if (!cache.has(name)) {
-        const promise = fetch(`data/${name}.json`, { cache: 'no-cache' }).then(response => {
+        const promise = fetch(`data/${name}.json?t=${Date.now()}`, { cache: 'no-store' }).then(response => {
             if (!response.ok) throw new Error(`data/${name}.json → HTTP ${response.status}`);
             return response.json();
         });

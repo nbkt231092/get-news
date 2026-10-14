@@ -26,11 +26,11 @@ export function timeAgo(iso, now = Date.now()) {
     const time = Date.parse(iso);
     if (Number.isNaN(time)) return '';
     const minutes = Math.round(Math.max(0, now - time) / 60000);
-    if (minutes < 1) return 'ahora';
-    if (minutes < 60) return `hace ${minutes} min`;
+    if (minutes < 1) return 'just now';
+    if (minutes < 60) return `${minutes}m ago`;
     const hours = Math.round(minutes / 60);
-    if (hours < 24) return `hace ${hours} h`;
-    return `hace ${Math.round(hours / 24)} d`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${Math.round(hours / 24)}d ago`;
 }
 
 export function fold(text) {

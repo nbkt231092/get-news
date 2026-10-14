@@ -8,7 +8,7 @@ import { clusterArticles } from './cluster.js';
 import { refine } from './refine.js';
 import { scoreStories } from './score.js';
 
-export const MARKETS = { es: { lang: 'es' }, intl: { lang: 'en' } };
+export const MARKETS = { us: { lang: 'en' }, military: { lang: 'en' }, intl: { lang: 'en' }, vn: { lang: 'vi' } };
 const MAX_SINGLE_SOURCE_STORIES = 150;
 
 async function writeJson(file, data) {
@@ -29,7 +29,7 @@ function collect(fetched, sourcesById, now) {
                 for (const article of parsed) {
                     if (!articles[source.market].has(article.id)) articles[source.market].set(article.id, article);
                 }
-                if (!count) error = 'Sin artículos recientes';
+                if (!count) error = 'No recent articles';
             } catch (parseError) {
                 error = parseError.message;
             }
@@ -44,7 +44,7 @@ function assertHealthy(feeds, sourcesById) {
         const marketFeeds = feeds.filter(feed => sourcesById[feed.sourceId].market === market);
         const failed = marketFeeds.filter(feed => !feed.ok).length;
         if (failed > marketFeeds.length / 2) {
-            throw new Error(`Fallan ${failed}/${marketFeeds.length} feeds del mercado ${market}; no se publica`);
+            throw new Error(`${failed}/${marketFeeds.length} feeds failed in market ${market}; build aborted`);
         }
     }
 }

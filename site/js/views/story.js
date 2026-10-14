@@ -6,16 +6,16 @@ import { coverageBar, storyMeta, storyImage, kickerLine } from '../components.js
 
 function missingStory(market, id) {
     const saved = prefs.saved()[id];
-    document.title = 'Historia no disponible · OnlyNews';
+    document.title = 'Story unavailable · OnlyNews';
     return h('div', { class: 'notice' },
-        h('h1', {}, 'Esta historia ya no está en portada'),
+        h('h1', {}, 'This story is no longer on the front page'),
         h('p', {}, saved
-            ? `Guardaste «${saved.title}», pero ya no aparece en las noticias de las últimas 48 h.`
-            : 'Puede que haya caducado: mostramos las noticias de las últimas 48 h.'),
+            ? `You saved “${saved.title}”, but it no longer appears in the news from the last 48h.`
+            : 'It may have expired: we show news from the last 48h.'),
         h('p', {},
-            h('a', { href: `#/${market}` }, 'Volver a la portada'),
+            h('a', { href: `#/${market}` }, 'Back to front page'),
             saved ? ' · ' : null,
-            saved ? h('button', { type: 'button', class: 'btn', onclick: () => { prefs.removeSaved(id); location.hash = `#/${market}/guardadas`; } }, 'Quitar de guardadas') : null));
+            saved ? h('button', { type: 'button', class: 'btn', onclick: () => { prefs.removeSaved(id); location.hash = `#/${market}/guardadas`; } }, 'Remove from saved') : null));
 }
 
 function articleItem(article, source) {
@@ -38,7 +38,7 @@ function column(side, articles, sourcesById, active) {
         h('h2', { class: 'column-title' }, `${SIDE_LABELS[side]} · ${articles.length}`),
         articles.length
             ? h('ol', { class: 'column-list', style: 'display:grid;gap:12px' }, articles.map(article => articleItem(article, sourcesById[article.sourceId])))
-            : h('p', { class: 'empty' }, 'Ningún medio de este lado ha cubierto la historia.'));
+            : h('p', { class: 'empty' }, 'No outlet on this side has covered the story.'));
 }
 
 export async function renderStory(market, id) {
@@ -58,7 +58,7 @@ export async function renderStory(market, id) {
 
     const columns = h('div', { class: 'columns', style: `--cols:${sides.length}` },
         sides.map(side => column(side, bySide[side], sourcesById, side === active)));
-    const tabs = h('div', { class: 'side-tabs', role: 'tablist', 'aria-label': 'Cobertura por orientación' },
+    const tabs = h('div', { class: 'side-tabs', role: 'tablist', 'aria-label': 'Coverage by orientation' },
         sides.map(side => h('button', {
             type: 'button', role: 'tab', class: `side-tab side-tab--${side}`, 'aria-controls': `col-${side}`,
             'aria-selected': String(side === active), onclick: () => selectSide(side),
@@ -71,25 +71,25 @@ export async function renderStory(market, id) {
     const sourceIds = [...new Set(story.articles.map(article => article.sourceId))]
         .sort((a, b) => (sourcesById[a]?.bias ?? 0) - (sourcesById[b]?.bias ?? 0));
     const saveButton = h('button', { type: 'button', class: 'btn', 'aria-pressed': String(prefs.isSaved(story.id)) },
-        prefs.isSaved(story.id) ? '★ Guardada' : '☆ Guardar');
+        prefs.isSaved(story.id) ? '★ Saved' : '☆ Save');
     saveButton.addEventListener('click', () => {
         const saved = prefs.toggleSaved(story, market);
         saveButton.setAttribute('aria-pressed', String(saved));
-        saveButton.textContent = saved ? '★ Guardada' : '☆ Guardar';
+        saveButton.textContent = saved ? '★ Saved' : '☆ Save';
     });
-    const copyButton = h('button', { type: 'button', class: 'btn' }, 'Copiar enlace');
+    const copyButton = h('button', { type: 'button', class: 'btn' }, 'Copy link');
     copyButton.addEventListener('click', async () => {
         try {
             await navigator.clipboard.writeText(location.href);
-            copyButton.textContent = 'Enlace copiado';
+            copyButton.textContent = 'Link copied';
         } catch {
-            copyButton.textContent = 'No se pudo copiar';
+            copyButton.textContent = 'Could not copy';
         }
-        setTimeout(() => { copyButton.textContent = 'Copiar enlace'; }, 2000);
+        setTimeout(() => { copyButton.textContent = 'Copy link'; }, 2000);
     });
 
     return h('article', { class: 'story-page' },
-        h('a', { class: 'back', href: `#/${market}` }, '← Portada'),
+        h('a', { class: 'back', href: `#/${market}` }, '← Front page'),
         h('header', { class: 'story-head' },
             h('div', { class: 'story-head-text' },
                 kickerLine(story),
@@ -97,7 +97,7 @@ export async function renderStory(market, id) {
                 story.summary ? h('p', { class: 'lead-summary' }, story.summary) : null,
                 coverageBar(story.coverage, { large: true }),
                 storyMeta(story),
-                h('div', { class: 'chips', 'aria-label': 'Cubierta por' },
+                h('div', { class: 'chips', 'aria-label': 'Covered by' },
                     sourceIds.map(sourceId => h('span', { class: 'chip' },
                         h('span', { class: `dot dot--${sideOf(sourcesById[sourceId]?.bias ?? null)}`, 'aria-hidden': 'true' }),
                         sourcesById[sourceId]?.name ?? sourceId))),

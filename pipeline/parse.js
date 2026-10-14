@@ -125,11 +125,11 @@ export function parseFeed(xml, source, { now = new Date() } = {}) {
     try {
         doc = parser.parse(xml);
     } catch (error) {
-        throw new Error(`XML inválido: ${error.message}`);
+        throw new Error(`Invalid XML: ${error.message}`);
     }
     const isObject = doc && typeof doc === 'object';
     const kind = !isObject ? null : 'rss' in doc ? 'rss' : 'rdf:RDF' in doc ? 'rdf' : 'feed' in doc ? 'atom' : null;
-    if (!kind) throw new Error('Formato de feed no reconocido');
+    if (!kind) throw new Error('Unrecognized feed format');
     // Un <channel> vacío llega como '' → se trata como feed válido sin items.
     const raw = kind === 'rss' ? doc.rss?.channel : kind === 'rdf' ? doc['rdf:RDF'] : doc.feed;
     const root = raw && typeof raw === 'object' ? raw : {};

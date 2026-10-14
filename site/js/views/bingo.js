@@ -3,12 +3,12 @@ import { loadMarket } from '../data.js';
 import { t, MARKET_NAMES } from '../components.js';
 import { bingoFor } from '../satire/bingo.js';
 
-const hhmm = iso => new Date(iso).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+const hhmm = iso => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
 export async function renderBingo(market) {
     const { stories, sourcesById, generatedAt } = await loadMarket(market);
     document.title = `${t('bingoTitle')} · OnlyNews`;
-    const { cells, lines } = bingoFor(stories, (generatedAt ?? new Date().toISOString()).slice(0, 10), { lang: market === 'intl' ? 'en' : 'es' });
+    const { cells, lines } = bingoFor(stories, (generatedAt ?? new Date().toISOString()).slice(0, 10), { lang: 'en' });
     const inLine = new Set(lines.flatMap(line => line.cells));
     const name = id => sourcesById[id]?.name ?? id;
     return h('section', { class: 'page satire-page' },

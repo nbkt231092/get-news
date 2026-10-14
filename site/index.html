@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OnlyNews</title>
-    <meta name="description" content="Las mismas noticias, contadas por todos los medios: compara cómo las cubren izquierda, centro y derecha.">
+    <meta name="description" content="The same news, told by every outlet: compare how Left, Center, and Right cover each story.">
     <meta name="color-scheme" content="light dark">
     <link rel="icon" href="icon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,41 +15,44 @@
         try {
             const theme = JSON.parse(localStorage.getItem('onlynews:theme'));
             if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
-        } catch { /* tema automático */ }
+        } catch { /* auto theme */ }
     </script>
     <script type="module" src="js/main.js"></script>
 </head>
 <body>
-    <a class="skip-link" href="#app">Saltar al contenido</a>
+    <a class="skip-link" href="#app">Skip to content</a>
     <header class="site-header">
         <div class="wrap header-inner">
-            <a class="brand" href="#/" aria-label="OnlyNews, portada">
+            <a class="brand" href="#/us" aria-label="OnlyNews, home">
                 <span class="brand-word">ONLYNEWS</span>
                 <span class="brand-stripe" aria-hidden="true"><span></span><span></span><span></span></span>
                 <span class="brand-sticker" aria-hidden="true">😜</span>
             </a>
-            <nav class="market-tabs" aria-label="Edición">
-                <a href="#/es" data-market="es">España</a>
-                <a href="#/intl" data-market="intl">Internacional</a>
+            <nav class="market-tabs" aria-label="Edition">
+                <a href="#/us" data-market="us">US</a>
+                <a href="#/military" data-market="military">US Military</a>
+                <a href="#/intl" data-market="intl">International</a>
+                <a href="#/vn" data-market="vn">Vietnam</a>
             </nav>
             <form class="search" role="search">
-                <label class="visually-hidden" for="q">Buscar historias</label>
-                <input id="q" name="q" type="search" placeholder="Buscar…" autocomplete="off">
+                <label class="visually-hidden" for="q">Search stories</label>
+                <input id="q" name="q" type="search" placeholder="Search…" autocomplete="off">
             </form>
             <div class="header-actions">
-                <button type="button" class="satire-toggle" id="satire-toggle" aria-pressed="false" aria-label="Modo satírico" title="Activar modo satírico">😜</button>
+                <button type="button" class="btn refresh-btn" id="refresh-btn" title="Fetch & build latest news from RSS feeds">↻ Get News</button>
+                <button type="button" class="satire-toggle" id="satire-toggle" aria-pressed="false" aria-label="Satire mode" title="Enable satire mode">😜</button>
                 <button type="button" class="icon-btn" id="theme-toggle"></button>
-                <a class="icon-btn" href="#/fuentes" aria-label="Medios y ajustes" title="Medios y ajustes"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></a>
+                <a class="icon-btn" href="#/fuentes" aria-label="Sources & settings" title="Sources & settings"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></a>
             </div>
         </div>
     </header>
     <p class="tagline" id="tagline" hidden></p>
-    <div id="monitor" class="monitor" aria-label="Resumen de cobertura de la edición" hidden></div>
+    <div id="monitor" class="monitor" aria-label="Edition coverage summary" hidden></div>
     <main id="app" class="wrap" tabindex="-1"></main>
     <footer class="site-footer">
         <div class="wrap">
             <p id="feed-status"></p>
-            <p><a href="#/fuentes">Cómo clasificamos los medios</a> · Clasificación orientativa · <a href="https://github.com/kenserikawa/onlynews">Código</a></p>
+            <p><a href="#/fuentes">How we classify media sources</a> · Indicative ratings · <a href="https://github.com/kenserikawa/onlynews">Source code</a></p>
         </div>
     </footer>
 </body>

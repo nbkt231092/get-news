@@ -1,6 +1,6 @@
 // Arranque de la web: router por hash, tema, buscador y estado de los feeds.
 import { prefs } from './prefs.js';
-import { loadJson, loadMarket } from './data.js';
+import { loadJson, loadMarket, clearCache } from './data.js';
 import { marketSummary } from './coverage.js';
 import { MARKET_NAMES, t } from './components.js';
 import { scoreLine } from './satire/voice.js';
@@ -13,7 +13,7 @@ import { renderSources } from './views/sources.js';
 import { renderAwards } from './views/awards.js';
 import { renderBingo } from './views/bingo.js';
 
-const MARKETS = ['es', 'intl'];
+const MARKETS = ['us', 'military', 'intl', 'vn'];
 // Iconos SVG fijos (no son datos externos), porque los glifos ◐☀☾ faltan en muchas fuentes.
 const ICON = body => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
 // El botón muestra el tema al que se pasa al pulsarlo.
@@ -21,7 +21,7 @@ const THEME_ICONS = {
     light: ICON('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
     dark: ICON('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'),
 };
-const THEME_NAMES = { light: 'claro', dark: 'oscuro' };
+const THEME_NAMES = { light: 'light', dark: 'dark' };
 const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
 
 const app = document.getElementById('app');
@@ -29,6 +29,7 @@ const searchForm = document.querySelector('.search');
 const themeButton = document.getElementById('theme-toggle');
 const monitor = document.getElementById('monitor');
 const satireButton = document.getElementById('satire-toggle');
+const refreshButton = document.getElementById('refresh-btn');
 const tagline = document.getElementById('tagline');
 let renderToken = 0;
 let monitorToken = 0;
@@ -45,8 +46,8 @@ function applyTheme(theme) {
     else document.documentElement.dataset.theme = theme;
     const next = effectiveTheme(theme) === 'dark' ? 'light' : 'dark';
     themeButton.innerHTML = THEME_ICONS[next];
-    themeButton.title = `Cambiar a tema ${THEME_NAMES[next]}`;
-    themeButton.setAttribute('aria-label', `Cambiar a tema ${THEME_NAMES[next]}`);
+    themeButton.title = `Switch to ${THEME_NAMES[next]} theme`;
+    themeButton.setAttribute('aria-label', `Switch to ${THEME_NAMES[next]} theme`);
 }
 
 function parseRoute() {
@@ -68,7 +69,7 @@ async function show(viewPromise, { keepScroll = false } = {}) {
     // para no encoger la página y perder el scroll.
     const scrollY = window.scrollY;
     app.setAttribute('aria-busy', 'true');
-    if (!keepScroll) app.replaceChildren(h('p', { class: 'loading' }, 'Cargando…'));
+    if (!keepScroll) app.replaceChildren(h('p', { class: 'loading' }, 'Loading…'));
     try {
         const node = await viewPromise;
         if (token !== renderToken) return;
@@ -77,8 +78,8 @@ async function show(viewPromise, { keepScroll = false } = {}) {
         if (token !== renderToken) return;
         console.error(error);
         app.replaceChildren(h('div', { class: 'notice' },
-            h('h1', {}, 'No hemos podido cargar las noticias'),
-            h('p', {}, 'Los datos aún no están disponibles o ha fallado la conexión. Prueba a recargar en unos minutos.')));
+            h('h1', {}, 'Could not load the news'),
+            h('p', {}, 'Data is not available yet or the connection failed. Try reloading in a few minutes.')));
     } finally {
         if (token === renderToken) app.removeAttribute('aria-busy');
     }
@@ -89,7 +90,7 @@ async function show(viewPromise, { keepScroll = false } = {}) {
 function applySatire() {
     document.body.classList.toggle('is-satire', prefs.satire);
     satireButton.setAttribute('aria-pressed', String(prefs.satire));
-    satireButton.title = prefs.satire ? 'Desactivar modo satírico' : 'Activar modo satírico';
+    satireButton.title = prefs.satire ? 'Disable satire mode' : 'Enable satire mode';
     tagline.textContent = t('tagline');
     tagline.hidden = !tagline.textContent;
 }
@@ -108,14 +109,14 @@ async function showMonitor(market) {
             ? h('div', { class: 'wrap monitor-inner' },
                 item(null, t('monitor', { market: MARKET_NAMES[market], n: summary.sources })),
                 h('span', { class: 'monitor-score' }, scoreLine(summary.share)),
-                h('a', { class: 'monitor-link', href: `#/${market}/premios` }, 'Premios'),
+                h('a', { class: 'monitor-link', href: `#/${market}/premios` }, 'Awards'),
                 h('a', { class: 'monitor-link', href: `#/${market}/bingo` }, 'Bingo'),
                 blindspots)
             : h('div', { class: 'wrap monitor-inner' },
                 item(null, t('monitor', { market: MARKET_NAMES[market], n: summary.sources })),
-                item('left', `Izq ${summary.share.left}%`),
-                item('center', `Centro ${summary.share.center}%`),
-                item('right', `Der ${summary.share.right}%`),
+                item('left', `Left ${summary.share.left}%`),
+                item('center', `Center ${summary.share.center}%`),
+                item('right', `Right ${summary.share.right}%`),
                 blindspots));
         monitor.hidden = false;
     } catch {
@@ -139,7 +140,7 @@ function route({ keepScroll = false } = {}) {
     }
     const market = MARKETS.includes(parts[0]) ? parts[0] : null;
     if (!market) {
-        location.replace(`#/${MARKETS.includes(prefs.market) ? prefs.market : 'es'}`);
+        location.replace(`#/${MARKETS.includes(prefs.market) ? prefs.market : 'us'}`);
         return;
     }
     prefs.market = market;
@@ -164,8 +165,8 @@ function route({ keepScroll = false } = {}) {
     if (sub === 'guardadas') return show(renderSaved(market), opts);
     if (sub.startsWith('s-')) return show(renderStory(market, sub), opts);
     return show(Promise.resolve(h('div', { class: 'notice' },
-        h('h1', {}, 'Página no encontrada'),
-        h('p', {}, h('a', { href: `#/${market}` }, 'Volver a la portada')))));
+        h('h1', {}, 'Page not found'),
+        h('p', {}, h('a', { href: `#/${market}` }, 'Back to front page')))));
 }
 
 async function showFeedStatus() {
@@ -190,7 +191,7 @@ document.querySelector('.skip-link').addEventListener('click', event => {
 searchForm.addEventListener('submit', event => {
     event.preventDefault();
     const query = searchForm.q.value.trim();
-    const market = MARKETS.includes(prefs.market) ? prefs.market : 'es';
+    const market = MARKETS.includes(prefs.market) ? prefs.market : 'us';
     location.hash = query ? `#/${market}/buscar?q=${encodeURIComponent(query)}` : `#/${market}`;
 });
 
@@ -211,6 +212,33 @@ satireButton.addEventListener('click', () => {
     }
     route({ keepScroll: true });
 });
+
+if (refreshButton) {
+    refreshButton.addEventListener('click', async () => {
+        if (refreshButton.disabled) return;
+        refreshButton.disabled = true;
+        refreshButton.textContent = '⏳ Updating…';
+        const status = document.getElementById('feed-status');
+        if (status) status.textContent = 'Fetching RSS feeds & building latest news…';
+        try {
+            const response = await fetch('/api/build', { method: 'POST' });
+            const result = await response.json();
+            if (!response.ok || !result.ok) throw new Error(result.error || `HTTP ${response.status}`);
+            clearCache();
+            await showFeedStatus();
+            route({ keepScroll: true });
+            refreshButton.textContent = `✓ Updated (${result.okCount}/${result.totalCount})`;
+        } catch (error) {
+            console.error(error);
+            refreshButton.textContent = '✗ Build Failed';
+        } finally {
+            setTimeout(() => {
+                refreshButton.disabled = false;
+                refreshButton.textContent = '↻ Get News';
+            }, 3000);
+        }
+    });
+}
 
 applyTheme(prefs.theme);
 applySatire();

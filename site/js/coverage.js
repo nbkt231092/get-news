@@ -3,10 +3,10 @@
 
 export const SIDES = ['left', 'center', 'right', 'unrated'];
 
-export const SIDE_LABELS = { left: 'Izquierda', center: 'Centro', right: 'Derecha', unrated: 'Sin clasificar' };
+export const SIDE_LABELS = { left: 'Left', center: 'Center', right: 'Right', unrated: 'Unrated' };
 
 export const BIAS_LABELS = {
-    '-2': 'Izquierda', '-1': 'Centro-izquierda', '0': 'Centro', '1': 'Centro-derecha', '2': 'Derecha', 'null': 'Sin clasificar',
+    '-2': 'Left', '-1': 'Center-left', '0': 'Center', '1': 'Center-right', '2': 'Right', 'null': 'Unrated',
 };
 
 export function sideOf(bias) {

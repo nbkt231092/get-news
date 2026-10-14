@@ -14,12 +14,16 @@ const STOPWORDS = {
         what about which when your more been were into over after than them then some could also just like only
         other these those being while where does here live latest update updates video watch news week year years
         today amid why`,
+    vi: `cua va cac co duoc trong cho la nhung nguoi mot khong voi nay khi da den tu ve tai theo sau tren
+        nhieu hon cung nhu vi se dang rat vao ra len xuong qua lai giua truoc do day
+        hay hoac neu thi ma boi tai sao nhu the nao bao nhieu`,
 };
 const STOP = Object.fromEntries(Object.entries(STOPWORDS).map(([lang, words]) => [lang, new Set(words.split(/\s+/))]));
 
 export function normalize(text) {
     return String(text ?? '')
         .toLowerCase()
+        .replace(/đ/g, 'd')
         .normalize('NFD')
         .replace(/\p{M}/gu, '')
         .replace(/[^\p{L}\p{N}]+/gu, ' ')
@@ -28,9 +32,10 @@ export function normalize(text) {
 
 export function tokens(text, lang) {
     const stop = STOP[lang] ?? STOP.en;
+    const minLen = lang === 'vi' ? 2 : 3;
     return normalize(text)
         .split(' ')
-        .filter(word => word && !stop.has(word) && (word.length >= 3 || /^\d+$/.test(word)));
+        .filter(word => word && !stop.has(word) && (word.length >= minLen || /^\d+$/.test(word)));
 }
 
 // Fechas y números unen historias distintas del mismo día («12 de octubre»), así que el

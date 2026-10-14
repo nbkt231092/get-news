@@ -16,8 +16,8 @@ const LINES = [
     [0, 5, 10, 15], [3, 6, 9, 12],
 ];
 
-export function bingoFor(stories, date, { lang = 'es' } = {}) {
-    const bag = CLICHES[lang] ?? CLICHES.es;
+export function bingoFor(stories, date, { lang = 'en' } = {}) {
+    const bag = CLICHES[lang] ?? CLICHES.en;
     const phrases = [...bag].sort((a, b) => hashString(`${date}|${a}`) - hashString(`${date}|${b}`)).slice(0, 16);
     const articles = stories
         .filter(story => !isSensitive(story))

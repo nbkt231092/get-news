@@ -2,7 +2,7 @@
 import { pick } from './pick.js';
 import { isSensitive, normalizeTitle } from './guard.js';
 
-const SIDE_NAME = { left: 'la izquierda', center: 'el centro', right: 'la derecha' };
+const SIDE_NAME = { left: 'the Left', center: 'the Center', right: 'the Right' };
 const OTHER = { left: 'right', right: 'left' };
 const cap = text => text[0].toUpperCase() + text.slice(1);
 
@@ -42,8 +42,8 @@ function wordWar(articles) {
 }
 
 function quoteList(terms) {
-    const quoted = terms.map(term => `«${term}»`);
-    return quoted.length === 2 ? quoted.join(' o ') : `${quoted.slice(0, -1).join(', ')} o ${quoted.at(-1)}`;
+    const quoted = terms.map(term => `“${term}”`);
+    return quoted.length === 2 ? quoted.join(' or ') : `${quoted.slice(0, -1).join(', ')} or ${quoted.at(-1)}`;
 }
 
 function identicalCount(story) {
@@ -67,48 +67,48 @@ export function kickerFor(story, sourcesById) {
         const other = OTHER[side];
         return pick([
             story.coverage[side] === 1
-                ? `Solo se entera un medio de ${SIDE_NAME[side]}. ${cap(SIDE_NAME[other])}, de puente`
-                : `Solo se enteran ${story.coverage[side]} medios de ${SIDE_NAME[side]}. ${cap(SIDE_NAME[other])}, de puente`,
-            `${cap(SIDE_NAME[other])} sigue sin confirmar que esto haya pasado`,
-            `Noticia exclusiva para lectores de ${SIDE_NAME[side]}`,
+                ? `Only 1 outlet on ${SIDE_NAME[side]} noticed. ${cap(SIDE_NAME[other])} took the day off`
+                : `Only ${story.coverage[side]} outlets on ${SIDE_NAME[side]} noticed. ${cap(SIDE_NAME[other])} took the day off`,
+            `${cap(SIDE_NAME[other])} has yet to confirm this actually happened`,
+            `Exclusive news for readers on ${SIDE_NAME[side]}`,
         ], seed);
     }
 
     const copies = identicalCount(story);
     if (copies >= 3) {
         return pick([
-            `${copies} medios llegan a la misma frase a la vez. La nota de agencia, orgullosa`,
-            `Récord de originalidad: ${copies} titulares idénticos`,
+            `${copies} outlets came up with the exact same sentence at once. Wire service is proud`,
+            `Originality record: ${copies} identical headlines`,
         ], seed);
     }
 
     const terms = wordWar(story.articles);
     if (terms.length >= 2) {
         return pick([
-            `${quoteList(terms)}: depende de a quién preguntes`,
-            `Los medios no se ponen de acuerdo ni en la palabra: ${quoteList(terms)}`,
+            `${quoteList(terms)}: depends on who you ask`,
+            `Outlets can’t even agree on the word: ${quoteList(terms)}`,
         ], seed);
     }
 
     if (story.sourceCount >= 6 && left >= 1 && center >= 1 && right >= 1) {
         return pick([
-            `Milagro: ${story.sourceCount} medios de izquierda, centro y derecha se ponen de acuerdo en algo`,
-            'Se suspende la polarización durante una noticia',
+            `Miracle: ${story.sourceCount} outlets across Left, Center, and Right agree on something`,
+            'Polarization paused for one story',
         ], seed);
     }
 
     if (story.sourceCount >= 3 && rated > 0) {
         const major = ['left', 'right', 'center'].find(side => story.coverage[side] / rated >= 0.75);
-        if (major === 'center') return 'El centro, muy pendiente. Los extremos, mirando el móvil';
-        if (major) return `${cap(SIDE_NAME[major])}, muy pendiente. ${cap(SIDE_NAME[OTHER[major]])}, mirando el móvil`;
+        if (major === 'center') return 'The Center is paying close attention. Both wings are checking their phones';
+        if (major) return `${cap(SIDE_NAME[major])} is paying close attention. ${cap(SIDE_NAME[OTHER[major]])} is checking its phone`;
     }
 
     if (story.sourceCount === 1) {
         const name = sourcesById[story.articles[0].sourceId]?.name ?? story.articles[0].sourceId;
         return pick([
-            `Exclusiva de ${name}: el resto de la prensa ha decidido que esto no ha pasado`,
-            `${name} se entera; los demás, no`,
-            `Solo ${name} lo cuenta. Los demás tendrán sus motivos`,
+            `Exclusive from ${name}: the rest of the press decided this didn’t happen`,
+            `${name} noticed; everyone else didn’t`,
+            `Only ${name} is reporting it. The others must have their reasons`,
         ], seed);
     }
     return null;
