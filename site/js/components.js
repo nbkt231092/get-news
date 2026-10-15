@@ -4,7 +4,7 @@ import { SIDES, SIDE_LABELS, sideOf } from './coverage.js';
 import { prefs } from './prefs.js';
 import { say } from './satire/voice.js';
 
-export const MARKET_NAMES = { us: 'United States', military: 'US Military', intl: 'International', vn: 'Vietnam' };
+export const MARKET_NAMES = { us: 'United States', military: 'US Military', mystery: 'US Mystery & UFO', intl: 'International', vn: 'Vietnam' };
 const SHORT = { left: 'L', center: 'C', right: 'R' };
 const SEGMENT_LABELS = { left: 'LEFT', center: 'CEN', right: 'RIGHT', unrated: 'N/A' };
 

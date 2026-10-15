@@ -1,14 +1,15 @@
 # Get-News (OnlyNews Custom Edition)
 
-A Ground News–style multi-source news aggregator & clustering engine running locally on `http://localhost:8001`. It fetches live RSS feeds across **115 verified outlets (122 RSS feeds)**, groups related articles into stories using TF-IDF + average-linkage clustering, analyzes political/editorial coverage distribution (*Left / Center / Right*), highlights media blindspots, and lets you export curated stories directly to `.txt`.
+A Ground News–style multi-source news aggregator & clustering engine running locally on `http://localhost:8001`. It fetches live RSS feeds across **135 verified outlets (145 RSS feeds)**, groups related articles into stories using TF-IDF + average-linkage clustering, analyzes political/editorial coverage distribution (*Left / Center / Right*), highlights media blindspots, and lets you export curated stories directly to `.txt`.
 
 ---
 
 ## ✨ Key Features
 
-- **4 Dedicated Editions (115 Outlets / 122 Live RSS Feeds)**:
+- **5 Dedicated Editions (135 Outlets / 145 Live RSS Feeds)**:
   - **US (`#/us`)**: 30 major American news networks & newspapers (*NYT, WSJ, Fox News, PBS, Newsweek, The Atlantic, ProPublica, Daily Wire, The Federalist, FactCheck.org, Snopes, etc.*).
   - **US Military (`#/military`)**: 18 dedicated US defense, military branches, and national security outlets (*Defense News, Military Times, Breaking Defense, Task & Purpose, The War Zone, Defense One, Army Times, Navy Times, Marine Corps Times, Air & Space Forces, Defence Blog, RealClearDefense, etc.*).
+  - **Mystery (`#/mystery`)**: 20 U.S. Mystery, UFO/UAP, Extraterrestrial, Paranormal, Ancient Mysteries & Cosmic Anomaly sources (*The Debrief UAP, The Black Vault FOIA & UFO, Liberation Times UAP, Latest UFO Sightings, SETI Institute, US UFO & UAP Wire, US Paranormal & Cryptid Wire, The Daily Grail, Ancient Origins, Skeptical Inquirer, NeuroLogica, Atlas Obscura, UPI Odd News, HuffPost Weird News, Space.com, Universe Today, EarthSky, SciTechDaily Space, Futurism, Boing Boing*).
   - **International (`#/intl`)**: 35 global news agencies and international reporting outlets (*BBC, Al Jazeera, DW, France 24, The Guardian, The Economist, Financial Times, Politico, SCMP, Japan Times, etc.*).
   - **Vietnam (`#/vn`)**: **32 major Vietnamese news outlets** distributed across **Left**, **Center**, and **Right**:
     - **Left (`bias: -2`, `-1` — 12 outlets)**: *Tuổi Trẻ, Dân Việt, Nhà Báo & Công Luận, Gia Đình & Xã Hội, Báo Văn Hóa, aFamily, Thanh Niên, Dân Trí, Tiền Phong, Giáo Dục & Thời Đại, Tri Thức & Cuộc Sống, VietTimes*.

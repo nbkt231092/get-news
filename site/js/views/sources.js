@@ -47,6 +47,7 @@ export async function renderSources() {
             h('p', {}, 'Uncheck an outlet to hide it from your front page; coverage is recalculated without it. Preferences are saved only in this browser.')),
         marketSection('us'),
         marketSection('military'),
+        marketSection('mystery'),
         marketSection('intl'),
         marketSection('vn'));
 }

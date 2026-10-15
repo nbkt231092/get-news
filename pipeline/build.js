@@ -8,7 +8,13 @@ import { clusterArticles } from './cluster.js';
 import { refine } from './refine.js';
 import { scoreStories } from './score.js';
 
-export const MARKETS = { us: { lang: 'en' }, military: { lang: 'en' }, intl: { lang: 'en' }, vn: { lang: 'vi' } };
+export const MARKETS = {
+    us: { lang: 'en' },
+    military: { lang: 'en' },
+    mystery: { lang: 'en', maxSpanHours: 168 },
+    intl: { lang: 'en' },
+    vn: { lang: 'vi' },
+};
 const MAX_SINGLE_SOURCE_STORIES = 150;
 
 async function writeJson(file, data) {
@@ -57,8 +63,8 @@ export async function build({ sources, outDir, fetchImpl, now = new Date(), env 
 
     const generatedAt = now.toISOString();
     const outputs = {};
-    for (const [market, { lang }] of Object.entries(MARKETS)) {
-        const clusters = await refine(clusterArticles([...articles[market].values()], { lang }), { env, log, market });
+    for (const [market, { lang, maxSpanHours }] of Object.entries(MARKETS)) {
+        const clusters = await refine(clusterArticles([...articles[market].values()], { lang, ...(maxSpanHours ? { maxSpanHours } : {}) }), { env, log, market });
         const stories = scoreStories(clusters, sourcesById, now);
         const multi = stories.filter(story => story.sourceCount > 1);
         const singles = stories

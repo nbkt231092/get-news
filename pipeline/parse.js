@@ -134,6 +134,7 @@ export function parseFeed(xml, source, { now = new Date() } = {}) {
     const raw = kind === 'rss' ? doc.rss?.channel : kind === 'rdf' ? doc['rdf:RDF'] : doc.feed;
     const root = raw && typeof raw === 'object' ? raw : {};
 
+    const maxAge = source.market === 'mystery' ? 90 * 24 * 3600 * 1000 : MAX_AGE_MS;
     const articles = [];
     const seen = new Set();
     for (const item of root.item ?? root.entry ?? []) {
@@ -141,7 +142,7 @@ export function parseFeed(xml, source, { now = new Date() } = {}) {
         const title = cleanText(textOf(item.title));
         if (!url || !title || seen.has(url)) continue;
         const date = dateOf(item, now);
-        if (now - date > MAX_AGE_MS) continue;
+        if (now - date > maxAge) continue;
         seen.add(url);
 
         const summaryHtml = textOf(item.description) || textOf(item.summary) || textOf(item['content:encoded']) || textOf(item.content);

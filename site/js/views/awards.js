@@ -7,7 +7,7 @@ export async function renderAwards(market) {
     const { stories, sourcesById } = await loadMarket(market);
     document.title = `${t('awardsTitle')} · OnlyNews`;
     const awards = awardsFor(stories, sourcesById, { lang: 'en' });
-    const pressName = market === 'us' ? 'US press' : market === 'military' ? 'US military press' : market === 'vn' ? 'Vietnamese press' : 'international press';
+    const pressName = market === 'us' ? 'US press' : market === 'military' ? 'US military press' : market === 'mystery' ? 'US mystery & UFO press' : market === 'vn' ? 'Vietnamese press' : 'international press';
     return h('section', { class: 'page satire-page' },
         h('h1', { class: 'page-title' }, `${t('awardsTitle')} · ${MARKET_NAMES[market]}`),
         h('p', { class: 'hint' }, t('awardsIntro', { press: pressName })),

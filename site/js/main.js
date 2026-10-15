@@ -14,7 +14,7 @@ import { renderAwards } from './views/awards.js';
 import { renderBingo } from './views/bingo.js';
 import { renderSide } from './views/side.js';
 
-const MARKETS = ['us', 'military', 'intl', 'vn'];
+const MARKETS = ['us', 'military', 'mystery', 'intl', 'vn'];
 // Iconos SVG fijos (no son datos externos), porque los glifos ◐☀☾ faltan en muchas fuentes.
 const ICON = body => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
 // El botón muestra el tema al que se pasa al pulsarlo.

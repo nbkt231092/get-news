@@ -16,6 +16,7 @@ const SOURCES = [
     { id: 'i1', name: 'One', market: 'intl', bias: 0, site: 'https://one.com', feeds: ['https://one.com/rss'] },
     { id: 'i2', name: 'Two', market: 'intl', bias: 2, site: 'https://two.com', feeds: ['https://two.com/rss'] },
     { id: 'm1', name: 'Mil', market: 'military', bias: 0, site: 'https://mil.com', feeds: ['https://mil.com/rss'] },
+    { id: 'u1', name: 'Ufo', market: 'mystery', bias: 0, site: 'https://ufo.com', feeds: ['https://ufo.com/rss'] },
     { id: 'v1', name: 'Viet', market: 'vn', bias: 0, site: 'https://vn.com', feeds: ['https://vn.com/rss'] },
 ];
 
@@ -25,6 +26,7 @@ const FEEDS = {
     'https://tres.es/rss': rss([['Basketball league results', 'https://tres.es/acb']]),
     'https://one.com/rss': rss([['Storm hits the coast of Florida', 'https://one.com/storm']]),
     'https://mil.com/rss': rss([['Pentagon announces new defense package', 'https://mil.com/def']]),
+    'https://ufo.com/rss': rss([['Pentagon releases new UAP report on unexplained aerial sightings', 'https://ufo.com/uap']]),
     'https://vn.com/rss': rss([['Việt Nam thúc đẩy chuyển đổi số quốc gia', 'https://vn.com/cds']]),
 };
 
@@ -38,7 +40,7 @@ test('escribe los JSON con historias agrupadas y el estado de cada feed', async 
     const outDir = await mkdtemp(path.join(tmpdir(), 'onlynews-'));
     const { feeds } = await build({ sources: SOURCES, outDir, fetchImpl: fakeFetch, now: NOW, env: {}, log: quiet });
 
-    assert.deepEqual((await readdir(outDir)).sort(), ['intl.json', 'meta.json', 'military.json', 'sources.json', 'us.json', 'vn.json']);
+    assert.deepEqual((await readdir(outDir)).sort(), ['intl.json', 'meta.json', 'military.json', 'mystery.json', 'sources.json', 'us.json', 'vn.json']);
     const us = JSON.parse(await readFile(path.join(outDir, 'us.json'), 'utf8'));
     assert.equal(us.market, 'us');
     assert.equal(us.generatedAt, NOW.toISOString());
@@ -53,7 +55,7 @@ test('escribe los JSON con historias agrupadas y el estado de cada feed', async 
 
     const meta = JSON.parse(await readFile(path.join(outDir, 'meta.json'), 'utf8'));
     assert.deepEqual(meta.feeds.find(f => f.sourceId === 'i2'), { sourceId: 'i2', url: 'https://two.com/rss', ok: false, count: 0, error: 'HTTP 500' });
-    assert.equal(feeds.filter(f => f.ok).length, 6);
+    assert.equal(feeds.filter(f => f.ok).length, 7);
 });
 
 test('falla si cae más de la mitad de los feeds de un mercado', async () => {
