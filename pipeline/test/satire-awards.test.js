@@ -14,7 +14,7 @@ test('adjetivómetro exige 10 artículos y adjunta titulares de prueba', () => {
         ...many('a', 10, i => (i < 4 ? `Sánchez dinamita el pacto ${i}` : `Noticia tranquila ${i}`)),
         ...many('b', 3, i => `Feijóo estalla ${i}`),
     ];
-    const award = awardsFor(stories, SOURCES).find(x => x.id === 'adjetivometro');
+    const award = awardsFor(stories, SOURCES, { lang: 'es' }).find(x => x.id === 'adjetivometro');
     assert.equal(award.winner, 'Diario A');
     assert.equal(award.figure, '40 %');
     assert.equal(award.evidence.length, 3);
@@ -23,7 +23,7 @@ test('adjetivómetro exige 10 artículos y adjunta titulares de prueba', () => {
 
 test('las historias sensibles no cuentan para ningún premio', () => {
     const stories = many('a', 10, i => `Muere un hombre tras un brutal ataque ${i}`);
-    assert.equal(awardsFor(stories, SOURCES).find(x => x.id === 'adjetivometro'), undefined);
+    assert.equal(awardsFor(stories, SOURCES, { lang: 'es' }).find(x => x.id === 'adjetivometro'), undefined);
 });
 
 test('solo-yo cuenta exclusivas y copia-pega busca titulares idénticos', () => {
@@ -33,7 +33,7 @@ test('solo-yo cuenta exclusivas y copia-pega busca titulares idénticos', () => 
     assert.equal(awards.find(x => x.id === 'solo-yo').winner, 'Diario C');
     assert.equal(awards.find(x => x.id === 'solo-yo').figure, '4');
     const copy = awards.find(x => x.id === 'copia-pega');
-    assert.equal(copy.figure, '3 medios');
+    assert.equal(copy.figure, '3 sources');
     assert.equal(copy.winner, t);
 });
 
@@ -42,7 +42,7 @@ test('clickbait y grito detectan preguntas, fórmulas y exclamaciones', () => {
         ...many('a', 10, i => (i < 5 ? `¿Por qué sube la luz? ${i}` : `Así es el nuevo tren ${i}`)),
         ...many('b', 10, i => (i < 6 ? `¡Increíble! El ÚLTIMO capítulo ${i}` : `Normal ${i}`)),
     ];
-    const awards = awardsFor(stories, SOURCES);
+    const awards = awardsFor(stories, SOURCES, { lang: 'es' });
     assert.equal(awards.find(x => x.id === 'clickbait').winner, 'Diario A');
     assert.equal(awards.find(x => x.id === 'grito').winner, 'Diario B');
 });
@@ -60,12 +60,12 @@ test('consenso elige la historia con más medios y los tres lados', () => {
         { coverage: { left: 1, center: 1, right: 1, unrated: 0 } });
     const award = awardsFor([s], SOURCES).find(x => x.id === 'consenso');
     assert.equal(award.winner, 'Rufián encabezará la lista de ERC');
-    assert.equal(award.figure, '3 medios');
+    assert.equal(award.figure, '3 sources');
 });
 
 test('empate en porcentaje: gana el de más artículos y después el id', () => {
     const stories = [...many('a', 10, i => `Caos total ${i}`), ...many('b', 20, i => `Caos total ${i}`)];
-    assert.equal(awardsFor(stories, SOURCES).find(x => x.id === 'adjetivometro').winner, 'Diario B');
+    assert.equal(awardsFor(stories, SOURCES, { lang: 'es' }).find(x => x.id === 'adjetivometro').winner, 'Diario B');
 });
 
 test('en inglés usa sus propias listas', () => {

@@ -84,8 +84,8 @@ test('RDF (RSS 1.0) se reconoce', () => {
 });
 
 test('una página HTML o texto basura lanza error de formato', () => {
-    assert.throws(() => parseFeed('<!DOCTYPE html><html><body>Just a moment...</body></html>', source, { now }), /no reconocido/);
-    assert.throws(() => parseFeed('esto no es xml', source, { now }), /no reconocido|XML inválido/);
+    assert.throws(() => parseFeed('<!DOCTYPE html><html><body>Just a moment...</body></html>', source, { now }), /Unrecognized feed format/);
+    assert.throws(() => parseFeed('esto no es xml', source, { now }), /Unrecognized feed format|Invalid XML/);
 });
 
 test('un feed válido sin items devuelve lista vacía', () => {

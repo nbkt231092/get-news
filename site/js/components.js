@@ -1,6 +1,6 @@
 // Piezas de interfaz reutilizadas por las vistas. Todo el texto de los feeds entra como texto.
 import { h, safeUrl, timeAgo, plural } from './dom.js';
-import { SIDES, SIDE_LABELS } from './coverage.js';
+import { SIDES, SIDE_LABELS, sideOf } from './coverage.js';
 import { prefs } from './prefs.js';
 import { say } from './satire/voice.js';
 
@@ -160,17 +160,50 @@ export function storyMini(story, market) {
 
 export function blindspotPanel(stories, market) {
     const group = (side, title) => {
-        const list = stories.filter(story => story.blindspot === side).slice(0, 5);
+        const opposite = side === 'left' ? 'right' : 'left';
+        const strict = stories.filter(story => story.blindspot === side);
+        const strictIds = new Set(strict.map(s => s.id));
+        const fallback = stories.filter(story => !strictIds.has(story.id) && (story.coverage?.[side] ?? 0) > 0 && (story.coverage?.[opposite] ?? 0) === 0);
+        const list = [...strict, ...fallback].slice(0, 5);
         return [
-            h('h3', { class: `side-${side}` }, title),
+            h('h3', { class: `side-${side}` },
+                h('a', { href: `#/${market}/${side}`, class: 'side-heading-link' }, `${title} →`)),
             list.length ? h('ol', { class: 'mini-list' }, list.map(story => storyMini(story, market))) : h('p', { class: 'empty' }, 'None right now.'),
         ];
     };
     return h('section', { class: 'panel panel--blindspot', 'aria-labelledby': 'blindspots-h' },
-        h('h2', { id: 'blindspots-h' }, t('blindspots')),
+        h('h2', { id: 'blindspots-h' }, h('a', { href: `#/${market}/blindspots`, class: 'side-heading-link' }, t('blindspots'))),
         h('p', { class: 'hint' }, t('blindspotsHint')),
         group('left', 'Left only'),
-        group('right', 'Right only'));
+        group('right', 'Right only'),
+        h('div', { class: 'blindspot-actions' },
+            h('a', { class: 'panel-link', href: `#/${market}/left` }, 'Left page →'),
+            ' · ',
+            h('a', { class: 'panel-link', href: `#/${market}/right` }, 'Right page →')));
+}
+
+export function sideOutletsPanel(sourcesById, market) {
+    const sources = Object.values(sourcesById).filter(s => s.market === market);
+    const leftSources = sources.filter(s => sideOf(s.bias) === 'left').sort((a, b) => (a.bias ?? 0) - (b.bias ?? 0));
+    const rightSources = sources.filter(s => sideOf(s.bias) === 'right').sort((a, b) => (b.bias ?? 0) - (a.bias ?? 0));
+    if (!leftSources.length && !rightSources.length) return null;
+
+    const renderGroup = (side, label, list) => h('div', { class: 'side-outlet-group' },
+        h('h3', { class: `side-${side}` },
+            h('a', { href: `#/${market}/${side}`, class: 'side-heading-link' }, `${label} (${list.length}) →`)),
+        h('div', { class: 'chips' },
+            list.map(s => h('a', {
+                class: 'chip',
+                href: `#/${market}/${side}?source=${encodeURIComponent(s.id)}`,
+                title: `View stories from ${s.name}`,
+            },
+            h('span', { class: `dot dot--${side}`, 'aria-hidden': 'true' }),
+            s.name))));
+
+    return h('section', { class: 'panel', 'aria-labelledby': 'outlets-lr-h' },
+        h('h2', { id: 'outlets-lr-h' }, `${MARKET_NAMES[market]} · Left & Right`),
+        renderGroup('left', 'Left Newspapers', leftSources),
+        renderGroup('right', 'Right Newspapers', rightSources));
 }
 
 export function savedPanel(stories, market) {

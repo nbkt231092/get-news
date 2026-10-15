@@ -42,3 +42,11 @@ test('stemTokens recorta a raíces de 5 letras y quita fechas y números para el
     assert.deepEqual(stemTokens('Energy truce announced on Monday, October 12', 'en'), ['energ', 'truce', 'annou']);
     assert.deepEqual(stemTokens('alto el fuego energético', 'es'), stemTokens('alto el fuego para la energía', 'es'));
 });
+
+test('Vietnamese decodeEntities and stemTokens preserve diacritics and generate bigrams', () => {
+    assert.equal(decodeEntities('trung t&acirc;m c&ocirc;ng an x&atilde;'), 'trung tâm công an xã');
+    const viTokens = stemTokens('Sân bay Long Thành đón chuyến bay', 'vi');
+    assert.ok(viTokens.includes('sân_bay'));
+    assert.ok(viTokens.includes('long_thành'));
+    assert.notDeepEqual(stemTokens('lỗ hổng', 'vi'), stemTokens('sạt lở', 'vi'));
+});

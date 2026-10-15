@@ -1,6 +1,7 @@
 import { h } from '../dom.js';
 import { loadMarket } from '../data.js';
-import { t, MARKET_NAMES, leadStory, storyCard, storyRow, blindspotPanel, savedPanel, methodPanel, satirePanel, downloadTxt } from '../components.js';
+import { t, MARKET_NAMES, leadStory, storyCard, storyRow, blindspotPanel, sideOutletsPanel, savedPanel, methodPanel, satirePanel, downloadTxt } from '../components.js';
+import { sideNavBar } from './side.js';
 
 const GRID_SIZE = 6;
 
@@ -43,7 +44,7 @@ function sectionHeader(id, titleText, dark, getContainer, prefix) {
 }
 
 export async function renderHome(market) {
-    const { stories } = await loadMarket(market);
+    const { stories, sourcesById } = await loadMarket(market);
     document.title = `${MARKET_NAMES[market]} · OnlyNews`;
     if (!stories.length) {
         return h('div', { class: 'notice' },
@@ -95,6 +96,7 @@ export async function renderHome(market) {
     return h('div', { class: 'home' },
         h('div', { class: 'home-main' },
             h('h1', { class: 'visually-hidden' }, `Front page · ${MARKET_NAMES[market]}`),
+            sideNavBar(market, 'all'),
             leadStory(lead, market),
             topSectionEl,
             moreSectionEl,
@@ -102,6 +104,7 @@ export async function renderHome(market) {
         h('aside', { class: 'home-aside' },
             satirePanel(market),
             blindspotPanel(multi, market),
+            sideOutletsPanel(sourcesById, market),
             savedPanel(stories, market),
             methodPanel()));
 }

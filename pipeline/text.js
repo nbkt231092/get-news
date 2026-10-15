@@ -46,6 +46,25 @@ const DATE_WORDS = new Set(`lunes martes miercoles jueves viernes sabado domingo
 const STEM_LENGTH = 5;
 
 export function stemTokens(text, lang) {
+    if (lang === 'vi') {
+        const stop = STOP.vi;
+        const rawWords = String(text ?? '')
+            .toLowerCase()
+            .normalize('NFC')
+            .replace(/[^\p{L}\p{N}]+/gu, ' ')
+            .trim()
+            .split(' ')
+            .filter(w => w && w.length >= 2 && !/^\d+$/.test(w));
+        const words = rawWords.filter(w => {
+            const plain = w.replace(/đ/g, 'd').normalize('NFD').replace(/\p{M}/gu, '');
+            return !stop.has(plain) && !DATE_WORDS.has(plain);
+        });
+        const bigrams = [];
+        for (let i = 0; i < rawWords.length - 1; i++) {
+            bigrams.push(`${rawWords[i]}_${rawWords[i + 1]}`);
+        }
+        return [...words, ...bigrams];
+    }
     return tokens(text, lang)
         .filter(word => !DATE_WORDS.has(word) && !/^\d+$/.test(word))
         .map(word => word.slice(0, STEM_LENGTH));
@@ -59,6 +78,8 @@ const ENTITIES = {
 for (const vowel of 'aeiouAEIOU') ENTITIES[`${vowel}acute`] = `${vowel}́`.normalize('NFC');
 for (const vowel of 'aeiouAEIOU') ENTITIES[`${vowel}grave`] = `${vowel}̀`.normalize('NFC');
 for (const vowel of 'aeiouAEIOU') ENTITIES[`${vowel}uml`] = `${vowel}̈`.normalize('NFC');
+for (const vowel of 'aeiouAEIOU') ENTITIES[`${vowel}circ`] = `${vowel}\u0302`.normalize('NFC');
+for (const vowel of 'aeiouyAEIOUY') ENTITIES[`${vowel}tilde`] = `${vowel}\u0303`.normalize('NFC');
 Object.assign(ENTITIES, { ntilde: 'ñ', Ntilde: 'Ñ', ccedil: 'ç', Ccedil: 'Ç' });
 
 export function decodeEntities(text) {

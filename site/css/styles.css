@@ -331,3 +331,37 @@ main:focus { outline: none; }
     .icon-btn { width: 40px; height: 40px; }
     .satire-toggle { width: 40px; height: 40px; font-size: 20px; }
 }
+
+/* Left / Center / Right / Blindspots pages */
+.monitor-item.monitor-link, .monitor-alert.monitor-link { text-decoration: none; cursor: pointer; }
+.monitor-item.monitor-link:hover, .monitor-alert.monitor-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.side-heading-link { text-decoration: none; color: inherit; }
+.side-heading-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.blindspot-actions { display: flex; align-items: center; gap: 8px; padding-top: 6px; border-top: 2px solid var(--ink); }
+.side-outlet-group { display: grid; gap: 8px; }
+.side-outlet-group + .side-outlet-group { padding-top: 8px; border-top: 2px solid var(--ink); }
+.side-outlet-group .chip { text-decoration: none; }
+.side-outlet-group .chip:hover { background: var(--accent); color: var(--on-accent); }
+
+.side-page { display: grid; gap: 24px; }
+.side-page-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.home-main > .side-page-tabs { margin-bottom: 18px; }
+.side-page-tabs .side-tab { flex: 0 1 auto; text-decoration: none; padding: 10px 16px; }
+.side-page-tabs .side-tab.is-active { box-shadow: var(--shadow-sm); background: var(--accent); color: var(--on-accent); }
+.side-page-tabs .side-tab--left.is-active { background: var(--left); color: var(--on-left); }
+.side-page-tabs .side-tab--center.is-active { background: var(--center); color: var(--on-center); }
+.side-page-tabs .side-tab--right.is-active { background: var(--right); color: var(--on-right); }
+.side-page-tabs .side-tab--blindspots.is-active { background: var(--right); color: var(--on-right); }
+
+.side-outlets-panel { display: grid; gap: 14px; }
+.side-outlets-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.side-outlets-head .section-title { margin: 0; }
+.side-outlet-chips { gap: 10px; }
+.side-outlet-chip { padding: 0; overflow: hidden; }
+.side-outlet-chip.is-selected { outline: 3px solid var(--accent); background: var(--surface-2); }
+.side-outlet-filter { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; text-decoration: none; }
+.side-outlet-filter:hover { background: var(--surface-2); }
+.outlet-count { color: var(--muted); font-weight: 400; }
+.outlet-ext { display: inline-grid; place-items: center; padding: 6px 8px; border-left: 2px solid var(--ink); text-decoration: none; font-weight: 700; }
+.outlet-ext:hover { background: var(--accent); color: var(--on-accent); }
+

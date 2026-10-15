@@ -12,6 +12,7 @@ import { renderSaved } from './views/saved.js';
 import { renderSources } from './views/sources.js';
 import { renderAwards } from './views/awards.js';
 import { renderBingo } from './views/bingo.js';
+import { renderSide } from './views/side.js';
 
 const MARKETS = ['us', 'military', 'intl', 'vn'];
 // Iconos SVG fijos (no son datos externos), porque los glifos ◐☀☾ faltan en muchas fuentes.
@@ -113,8 +114,10 @@ async function showMonitor(market) {
         const { stories, sourcesById } = await loadMarket(market);
         if (token !== monitorToken) return;
         const summary = marketSummary(stories, id => sourcesById[id]?.bias ?? null);
-        const item = (side, text) => h('span', { class: `monitor-item${side ? ` monitor-item--${side}` : ''}` }, text);
-        const blindspots = h('span', { class: 'monitor-alert' }, `${summary.blindspots} ${summary.blindspots === 1 ? 'blindspot' : 'blindspots'}`);
+        const item = (side, text) => side
+            ? h('a', { href: `#/${market}/${side}`, class: `monitor-item monitor-item--${side} monitor-link` }, text)
+            : h('span', { class: 'monitor-item' }, text);
+        const blindspots = h('a', { href: `#/${market}/blindspots`, class: 'monitor-alert monitor-link' }, `${summary.blindspots} ${summary.blindspots === 1 ? 'blindspot' : 'blindspots'}`);
         monitor.replaceChildren(prefs.satire
             ? h('div', { class: 'wrap monitor-inner' },
                 item(null, t('monitor', { market: MARKET_NAMES[market], n: summary.sources })),
@@ -171,6 +174,9 @@ function route({ keepScroll = false } = {}) {
         return show(sub === 'premios' ? renderAwards(market) : renderBingo(market), opts);
     }
     if (!sub) return show(renderHome(market), opts);
+    if (sub === 'left' || sub === 'center' || sub === 'right' || sub === 'blindspots') {
+        return show(renderSide(market, sub, params.get('source') ?? ''), opts);
+    }
     if (sub === 'buscar') return show(renderSearch(market, query), opts);
     if (sub === 'guardadas') return show(renderSaved(market), opts);
     if (sub.startsWith('s-')) return show(renderStory(market, sub), opts);

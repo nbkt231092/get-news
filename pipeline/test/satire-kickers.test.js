@@ -22,41 +22,41 @@ test('nunca hay antetítulo en historias sensibles', () => {
 test('blindspot gana a cualquier otra regla', () => {
     const s = story('s-2', [['r1', 'Robles habla de Ceuta'], ['r2', 'Robles habla de Ceuta'], ['r3', 'Robles habla de Ceuta'], ['r4', 'Robles y Ceuta']], { blindspot: 'right' });
     const k = kickerFor(s, SOURCES);
-    assert.match(k, /derecha|izquierda/i);
-    assert.doesNotMatch(k, /misma frase|idénticos/);
+    assert.match(k, /Right|Left/i);
+    assert.doesNotMatch(k, /exact same sentence|identical/);
 });
 
 test('copia y pega con 3 o más titulares idénticos', () => {
     const t = 'El Gobierno aprueba los presupuestos';
-    assert.match(kickerFor(story('s-3', [['l1', t], ['c1', t], ['r1', t], ['r2', 'Otro titular']]), SOURCES), /3 (medios|titulares)/);
+    assert.match(kickerFor(story('s-3', [['l1', t], ['c1', t], ['r1', t], ['r2', 'Otro titular']]), SOURCES), /3 (outlets|identical headlines)/);
 });
 
 test('guerra de palabras lista los términos rivales tal como aparecen', () => {
     const s = story('s-4', [['l1', 'Trump anuncia una tregua energética'], ['c1', 'Trump anuncia un alto el fuego'], ['r1', 'Trump logra un pacto']]);
     const k = kickerFor(s, SOURCES);
-    for (const term of ['tregua', 'alto el fuego', 'pacto']) assert.ok(k.includes(`«${term}»`), k);
+    for (const term of ['tregua', 'alto el fuego', 'pacto']) assert.ok(k.includes(`“${term}”`), k);
 });
 
 test('la guerra de palabras exige términos de al menos dos medios distintos', () => {
     const s = story('s-4b', [['r4', 'Energy ceasefire as export deal draws criticism'], ['l1', 'Otro titular sin términos']]);
-    assert.doesNotMatch(kickerFor(s, SOURCES) ?? '', /depende de a quién|ni en la palabra/);
+    assert.doesNotMatch(kickerFor(s, SOURCES) ?? '', /depending on who|even on the word/);
 });
 
 test('el blindspot con un solo medio usa singular', () => {
     const s = story('s-4c', [['r1', 'Feijóo y Ceuta'], ['u1', 'Feijóo y Ceuta, crónica'], ['u2', 'Ceuta y Feijóo']], { blindspot: 'right' });
     s.coverage = { left: 0, center: 0, right: 1, unrated: 2 };
     const k = kickerFor(s, { ...SOURCES, u1: { name: 'U1', bias: null }, u2: { name: 'U2', bias: null } });
-    assert.doesNotMatch(k, /1 medios/);
+    assert.doesNotMatch(k, /1 outlets/);
 });
 
 test('consenso con 6 o más medios y los tres lados', () => {
     const s = story('s-5', [['l1', 'Rufián encabezará la lista de ERC'], ['l2', 'Rufián, candidato de ERC'], ['c1', 'ERC elige a Rufián'], ['c2', 'Rufián repetirá en el Congreso'], ['r1', 'Rufián se queda en Madrid'], ['r2', 'ERC apuesta por Rufián']]);
-    assert.match(kickerFor(s, SOURCES), /6 medios|polarización/);
+    assert.match(kickerFor(s, SOURCES), /6 outlets|polarization/);
 });
 
 test('lado mayoritario cuando un lado aporta el 75 % o más sin ser blindspot', () => {
     const s = story('s-6', [['r1', 'Feijóo presenta su plan'], ['r2', 'El plan de Feijóo'], ['r3', 'Feijóo y su plan'], ['l1', 'Plan de Feijóo, críticas']]);
-    assert.match(kickerFor(s, SOURCES), /La derecha, muy pendiente\. La izquierda, mirando el móvil/);
+    assert.match(kickerFor(s, SOURCES), /The Right is paying close attention\. The Left is checking its phone/);
 });
 
 test('exclusiva solitaria nombra al medio', () => {

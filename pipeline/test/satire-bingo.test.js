@@ -9,7 +9,7 @@ const story = (sourceId, title, at) => ({ id: `s-${++n}`, title, sourceCount: 1,
 test('el cartón tiene 16 casillas de la bolsa y es estable por fecha', () => {
     const a = bingoFor([], '2026-10-12');
     assert.equal(a.cells.length, 16);
-    assert.ok(a.cells.every(cell => CLICHES.es.includes(cell.phrase) && cell.hit === null));
+    assert.ok(a.cells.every(cell => CLICHES.en.includes(cell.phrase) && cell.hit === null));
     assert.deepEqual(bingoFor([], '2026-10-12').cells.map(c => c.phrase), a.cells.map(c => c.phrase));
     assert.notDeepEqual(bingoFor([], '2026-10-13').cells.map(c => c.phrase), a.cells.map(c => c.phrase));
     assert.equal(CLICHES.es.length, 24);

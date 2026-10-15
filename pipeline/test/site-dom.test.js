@@ -10,12 +10,12 @@ test('safeUrl solo deja pasar http(s)', () => {
     assert.equal(safeUrl('no es url'), null);
 });
 
-test('timeAgo en español', () => {
+test('timeAgo in English', () => {
     const now = Date.parse('2026-10-11T20:00:00Z');
-    assert.equal(timeAgo('2026-10-11T19:59:40Z', now), 'ahora');
-    assert.equal(timeAgo('2026-10-11T19:35:00Z', now), 'hace 25 min');
-    assert.equal(timeAgo('2026-10-11T17:00:00Z', now), 'hace 3 h');
-    assert.equal(timeAgo('2026-10-09T20:00:00Z', now), 'hace 2 d');
+    assert.equal(timeAgo('2026-10-11T19:59:40Z', now), 'just now');
+    assert.equal(timeAgo('2026-10-11T19:35:00Z', now), '25m ago');
+    assert.equal(timeAgo('2026-10-11T17:00:00Z', now), '3h ago');
+    assert.equal(timeAgo('2026-10-09T20:00:00Z', now), '2d ago');
     assert.equal(timeAgo('basura', now), '');
 });
 

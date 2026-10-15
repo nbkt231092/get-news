@@ -5,7 +5,7 @@
   "engines": { "node": ">=22" },
   "scripts": {
     "start": "node server.js",
-    "test": "node --test \"pipeline/test/*.test.js\"",
+    "test": "node --test pipeline/test",
     "build": "node pipeline/build.js site/data",
     "inspect": "node pipeline/tools/inspect.js"
   },
